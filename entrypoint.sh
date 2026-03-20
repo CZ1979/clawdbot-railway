@@ -39,8 +39,7 @@ gog gmail watch start \
   --topic "projects/academic-atlas-489918-s1/topics/gmail-events" \
   --label "INBOX" \
   || true
- ⁠
-
+  
 # Start the existing wrapper
 exec node /app/src/server.js
  ⁠
