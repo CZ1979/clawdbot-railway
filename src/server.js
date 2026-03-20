@@ -299,6 +299,28 @@ const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
 
+
+// Pub/Sub (IPv4) -> Railway -> proxy to local gog watcher (127.0.0.1:8788)
+const GMAIL_WATCH_TARGET = process.env.GMAIL_WATCH_TARGET?.trim() || "http://127.0.0.1:8788";
+const gmailProxy = httpProxy.createProxyServer({ target: GMAIL_WATCH_TARGET, changeOrigin: true });
+
+gmailProxy.on("error", (err, _req, res) => {
+  try {
+    res.writeHead(502, { "Content-Type": "text/plain" });
+    res.end("gmail proxy error: " + String(err));
+  } catch {
+    // ignore
+  }
+});
+
+// Pub/Sub pushes POST requests here:
+app.all("/gmail-pubsub", (req, res) => {
+  return gmailProxy.web(req, res);
+});
+
+
+
+
 // Minimal health endpoint for Railway.
 app.get("/setup/healthz", (_req, res) => res.json({ ok: true }));
 
