@@ -1,5 +1,3 @@
-### Inhalt für ⁠ entrypoint.sh ⁠ (komplette Datei)
-⁠ bash
 #!/usr/bin/env bash
 set -euo pipefail
 
