@@ -6,10 +6,17 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-/data/.config}"
 export HOME="${HOME:-/data}"
 mkdir -p /data/.openclaw /data/.config
 
+# IMPORTANT:
+# OpenClaw calls `tailscale status` without --socket, so it expects the default:
+# /var/run/tailscale/tailscaled.sock
+# Therefore we must run tailscaled on that socket.
+mkdir -p /var/run/tailscale
+export TAILSCALE_SOCKET=/var/run/tailscale/tailscaled.sock
+
 # Start tailscaled (userspace networking works on Railway without extra caps)
 tailscaled \
 --state=/data/.openclaw/tailscaled.state \
---socket=/data/.openclaw/tailscaled.sock \
+--socket=/var/run/tailscale/tailscaled.sock \
 --port=0 \
 --tun=userspace-networking >/tmp/tailscaled.log 2>&1 &
 
@@ -17,7 +24,7 @@ sleep 1
 
 # Authenticate non-interactively if authkey provided (recommended)
 if [[ -n "${TAILSCALE_AUTHKEY:-}" ]]; then
-tailscale --socket=/data/.openclaw/tailscaled.sock up \
+tailscale up \
 --authkey="${TAILSCALE_AUTHKEY}" \
 --hostname="ballstories-gateway-1" \
 --accept-dns=false --accept-routes=false || true
@@ -27,3 +34,4 @@ fi
 
 # Start the existing wrapper
 exec node /app/src/server.js
+ ⁠
