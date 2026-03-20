@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+  #!/usr/bin/env bash
 set -euo pipefail
 
 # Persist tool config on the Railway volume
@@ -31,6 +31,15 @@ tailscale up \
 else
 echo "WARN: TAILSCALE_AUTHKEY not set; tailscale will require manual auth after deploy."
 fi
+
+# Ensure Gmail watch is started (creates watch state). Safe to re-run.
+# Uses the topic you already had in the old setup.
+gog gmail watch start \
+  --account pete@ballstories.kids \
+  --topic "projects/academic-atlas-489918-s1/topics/gmail-events" \
+  --label "INBOX" \
+  || true
+ ⁠
 
 # Start the existing wrapper
 exec node /app/src/server.js
