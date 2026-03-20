@@ -1,4 +1,4 @@
-  #!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # Persist tool config on the Railway volume
